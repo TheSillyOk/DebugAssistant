@@ -3,27 +3,30 @@
 # A tool to redact sensitive information from the extremely verbose debug logs of Meow's Debug Assistant.
 # LICENSE: BSD 3-Clause by ThePedroo
 
-echo "Selecting the latest debug log file..."
+log() {
+  echo "$1"
+  echo ""
+}
 
-if [ -f "/data/local/tmp/DebugAssistant-Boot3.log" ]; then
-  LATEST_DEBUG_LOG="/data/local/tmp/DebugAssistant-Boot3.log"
-elif [ -f "/data/local/tmp/DebugAssistant-Boot2.log" ]; then
-  LATEST_DEBUG_LOG="/data/local/tmp/DebugAssistant-Boot2.log"
-elif [ -f "/data/local/tmp/DebugAssistant.log" ]; then
-  LATEST_DEBUG_LOG="/data/local/tmp/DebugAssistant.log"
-else
-  echo "No debug log found."
+SAVE_FOLDER="/data/local/tmp/DebugAssistant"
+mkdir -p "$SAVE_FOLDER"
+
+log "Selecting the latest debug log file..."
+
+LATEST_SUFFIX=$(basename $(ls -t "$SAVE_FOLDER/"DebugAssistant* | grep -v "-Redacted" | head -n 1) | grep -oE "(-[0-9]+)?")
+LATEST="DebugAssistant$LATEST_SUFFIX.log"
+if [[ ! -f "$SAVE_FOLDER/$LATEST" ]]; then
+  log "[!] No debug logs found. Exiting..."
+  sleep 4
   exit 1
 fi
 
-echo "Latest debug log selected: $LATEST_DEBUG_LOG"
+NEW_LOG="$SAVE_FOLDER/DebugAssistant-Redacted.log"
+DMESG_LOG="$SAVE_FOLDER/DebugAssistant-DMESG$LATEST_SUFFIX.log"
 
-NEW_LOG="/data/local/tmp/DebugAssistant-Redacted.log"
-if [ -f "$NEW_LOG" ]; then
-  rm "$NEW_LOG"
-fi
+log "Latest debug log selected: $LATEST"
 
-echo "Redacting sensitive information..."
+log "Redacting sensitive information..."
 
 sed -E                                                                   \
   -e 's/([0-9]{1,3}\.){3}[0-9]{1,3}/XXX.XXX.XXX/g'                       \
@@ -58,6 +61,11 @@ sed -E                                                                   \
                                                                          \
                                                                          \
                                                                          \
-  "$LATEST_DEBUG_LOG" > "$NEW_LOG"
+  "$SAVE_FOLDER/$LATEST" > "$NEW_LOG"
 
-echo "Redacted logs in $NEW_LOG"
+log "Redacted logs in $NEW_LOG"
+
+cp "$NEW_LOG" /sdcard/Download
+cp "$DMESG_LOG" /sdcard/Download
+log "Copied redacted log and matching dmesg to /sdcard/Download..."
+sleep 3
