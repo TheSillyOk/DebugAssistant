@@ -1,7 +1,7 @@
 id=debug_assistant
-name=Debug Assistant
-version=v3.0.2
-versionCode=302
-author=ThePedroo
-description=If can be made, why not done?
-updateJson=https://raw.githubusercontent.com/ThePedroo/RemoteFiles/refs/heads/main/DebugAssistant/update.json
+name=Debug Assistant-MOD
+version=versionName
+versionCode=versionNumber
+author=ThePedroo(❤️),TheSillyOk
+description=If is true, why deny?
+updateJson=https://raw.githubusercontent.com/TheSillyOk/DebugAssistant/refs/heads/remote/update.json

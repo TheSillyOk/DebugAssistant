@@ -1,5 +1,8 @@
 name: Make release
 
+permissions:
+  contents: write
+
 on:
   push:
 
@@ -22,10 +25,42 @@ jobs:
       - name: Get latest tag
         run: |
           latest_tag=$(git describe --tags --abbrev=0 || true)
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          latest_code=$(echo "${latest_tag}${{ github.run_number }}" | sed -E 's/[^0-9]//g')
+          echo "latest_tag=${latest_tag}-mod" >> $GITHUB_ENV
+          echo "latest_code=$latest_code" >> $GITHUB_ENV
+          zip_name="DebugAssistant-${latest_tag}-mod-${{ github.run_number }}"
+          echo "zip_name=$zip_name" >> $GITHUB_ENV
 
-      - name: Upload release
+      - name: Prepare module.prop for upload
+        run: |
+          sed -i 's/versionName/${{ env.latest_tag }} (${{ github.run_number }})/' module.prop
+          sed -i 's/versionNumber/${{ env.latest_code }}/' module.prop
+
+      - name: Upload CI artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DebugAssistant-${{ env.latest_tag }}-mod-${{ github.run_number }}
+          name: ${{ env.zip_name }}
           path: "*"
+
+      - name: Prepare remote
+        env:
+         GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf ".git"
+          zip -r "${{ env.zip_name }}.zip" .
+
+          git clone "https://github.com/${{ github.repository }}" --depth=1 -b "remote" remote
+          rm -rf remote/*.zip
+          mv "${{ env.zip_name }}.zip" remote/
+
+          cd remote/
+          sed -Ei 's/"version": ".*?"/"version": "${{ env.latest_tag }} (${{ github.run_number }})"/' update.json
+          sed -Ei 's/"versionCode": .*?,/"versionCode": ${{ env.latest_code }},/' update.json
+          sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/raw.githubusercontent.com\/TheSillyOk\/DebugAssistant\/refs\/heads\/remote\/${{ env.zip_name }}.zip"/' update.json
+
+          gh auth setup-git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "CI ${{ github.run_number }}"
+          git push origin remote
