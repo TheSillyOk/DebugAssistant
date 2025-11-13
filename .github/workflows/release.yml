@@ -1,0 +1,31 @@
+name: Make release
+
+on:
+  push:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+
+      - name: Clear unrelated files
+        run: |
+          rm -rf .github
+          rm LICENSE
+          rm README.md
+
+      - name: Get latest tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 || true)
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+
+      - name: Upload release
+        uses: actions/upload-artifact@v4
+        with:
+          name: DebugAssistant-${{ env.latest_tag }}-mod-${{ github.run_number }}
+          path: "*"
