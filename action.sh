@@ -1,28 +1,42 @@
+#!/bin/bash
+
 # Meow's Debug Assistant's Secure Censor
 #
 # A tool to redact sensitive information from the extremely verbose debug logs of Meow's Debug Assistant.
 # LICENSE: BSD 3-Clause by ThePedroo
 
-echo "Selecting the latest debug log file..."
+SAVE_FOLDER="/data/local/tmp/DebugAssistant"
+mkdir -p "$SAVE_FOLDER"
 
-if [ -f "/data/local/tmp/DebugAssistant-Boot3.log" ]; then
-  LATEST_DEBUG_LOG="/data/local/tmp/DebugAssistant-Boot3.log"
-elif [ -f "/data/local/tmp/DebugAssistant-Boot2.log" ]; then
-  LATEST_DEBUG_LOG="/data/local/tmp/DebugAssistant-Boot2.log"
-elif [ -f "/data/local/tmp/DebugAssistant.log" ]; then
-  LATEST_DEBUG_LOG="/data/local/tmp/DebugAssistant.log"
-else
+echo "Selecting the latest debug log file..."
+echo ""
+
+index=0
+for f in "$SAVE_FOLDER"/*; do
+  index=$((index + 1))
+  LATEST=$(ls -t "$SAVE_FOLDER" | awk NR==$index)
+  if [[ "$LATEST" == "" ]]; then
+    break
+  fi
+  if [[ "$LATEST" != "DebugAssistant-Redacted.log" && "$LATEST" == "DebugAssistant"* ]]; then
+    break
+  fi
+  LATEST=""
+done
+
+if [[ "$LATEST" == "" ]]; then
   echo "No debug log found."
   exit 1
 fi
 
-echo "Latest debug log selected: $LATEST_DEBUG_LOG"
+echo "Latest debug log selected: $LATEST"
 
-NEW_LOG="/data/local/tmp/DebugAssistant-Redacted.log"
+NEW_LOG="$SAVE_FOLDER/DebugAssistant-Redacted.log"
 if [ -f "$NEW_LOG" ]; then
   rm "$NEW_LOG"
 fi
 
+echo ""
 echo "Redacting sensitive information..."
 
 sed -E                                                                   \
@@ -58,6 +72,11 @@ sed -E                                                                   \
                                                                          \
                                                                          \
                                                                          \
-  "$LATEST_DEBUG_LOG" > "$NEW_LOG"
+  "$SAVE_FOLDER/$LATEST" > "$NEW_LOG"
 
+echo ""
 echo "Redacted logs in $NEW_LOG"
+echo ""
+
+echo "Copied redacted log to /sdcard/Download..."
+cp "$NEW_LOG" /sdcard/Download
