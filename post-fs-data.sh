@@ -24,7 +24,7 @@ function watch_logcat() {
 FILES=$(ls "$SAVE_FOLDER" | grep 'DebugAssistant')
 if [[ "$FILES" != "" ]]; then
   index=1
-  for f in "$SAVE_FOLDER"/; do
+  for f in "$SAVE_FOLDER"/*; do
     LATEST=$(ls -t "$SAVE_FOLDER" | awk NR==$index)
     if [[ "$LATEST" == "DebugAssistant.log" ]]; then
       prepare_file "-2"
