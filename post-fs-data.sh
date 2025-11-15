@@ -17,6 +17,7 @@ function prepare_file() {
 
 function watch_logcat() {
   local file_path="$SAVE_FOLDER/DebugAssistant$1.log"
+  prepare_file "$file_path"
 
   while [ ! ];do logcat;sleep 1;done > "$file_path" &
 }
@@ -31,5 +32,4 @@ else
   SUFFIX=""
 fi
 
-prepare_file "$SUFFIX"
 watch_logcat "$SUFFIX"
