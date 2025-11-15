@@ -21,10 +21,17 @@ jobs:
       - name: Get latest tag
         run: |
           latest_tag=$(git describe --tags --abbrev=0 || true)
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          latest_code=$(echo "$latest_tag" | sed -E 's/[^0-9]//g')
+          echo "latest_tag=${latest_tag}-mod" >> $GITHUB_ENV
+          echo "latest_code=$latest_code" >> $GITHUB_ENV
 
-      - name: Upload release
+      - name: Prepare module.prop for upload
+        run: |
+          sed -i 's/versionName/${{ env.latest_tag }} (${{ github.run_number }})/' module.prop
+          sed -i 's/versionNumber/${{ env.latest_code }}/' module.prop
+
+      - name: Upload module
         uses: actions/upload-artifact@v4
         with:
-          name: DebugAssistant-${{ env.latest_tag }}-mod-${{ github.run_number }}
+          name: DebugAssistant-${{ env.latest_tag }}-${{ github.run_number }}
           path: "*"
