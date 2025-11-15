@@ -11,19 +11,7 @@ mkdir -p "$SAVE_FOLDER"
 echo "Selecting the latest debug log file..."
 echo ""
 
-index=0
-for f in "$SAVE_FOLDER"/*; do
-  index=$((index + 1))
-  LATEST=$(ls -t "$SAVE_FOLDER" | awk NR==$index)
-  if [[ "$LATEST" == "" ]]; then
-    break
-  fi
-  if [[ "$LATEST" != "DebugAssistant-Redacted.log" && "$LATEST" == "DebugAssistant"* ]]; then
-    break
-  fi
-  LATEST=""
-done
-
+LATEST=$(basename $(ls -t "$SAVE_FOLDER"/DebugAssistant* | grep -v "-Redacted" | head -n 1))
 if [[ "$LATEST" == "" ]]; then
   echo "No debug log found."
   exit 1
@@ -32,9 +20,6 @@ fi
 echo "Latest debug log selected: $LATEST"
 
 NEW_LOG="$SAVE_FOLDER/DebugAssistant-Redacted.log"
-if [ -f "$NEW_LOG" ]; then
-  rm "$NEW_LOG"
-fi
 
 echo ""
 echo "Redacting sensitive information..."
@@ -78,5 +63,5 @@ echo ""
 echo "Redacted logs in $NEW_LOG"
 echo ""
 
-echo "Copied redacted log to /sdcard/Download..."
 cp "$NEW_LOG" /sdcard/Download
+echo "Copied redacted log to /sdcard/Download..."
