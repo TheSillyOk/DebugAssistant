@@ -21,29 +21,15 @@ function watch_logcat() {
   while [ ! ];do logcat;sleep 1;done > "$file_path" &
 }
 
-FILES=$(ls "$SAVE_FOLDER" | grep 'DebugAssistant')
-if [[ "$FILES" != "" ]]; then
-  index=1
-  for f in "$SAVE_FOLDER"/*; do
-    LATEST=$(ls -t "$SAVE_FOLDER" | awk NR==$index)
-    if [[ "$LATEST" == "DebugAssistant.log" ]]; then
-      prepare_file "-2"
-      watch_logcat "-2"
-      break
-    fi
-    if [[ "$LATEST" == "DebugAssistant-2.log" ]]; then
-      prepare_file "-3"
-      watch_logcat "-3"
-      break
-    fi
-    if [[ "$LATEST" == "DebugAssistant-3.log" ]]; then
-      prepare_file ""
-      watch_logcat ""
-      break
-    fi
-    index=$((index + 1))
-  done
+
+LATEST=$(basename $(ls -t "$SAVE_FOLDER"/DebugAssistant*.log | grep -v "Redacted" | head -n 1))
+if [[ "$LATEST" == "DebugAssistant.log" ]]; then
+  SUFFIX="-2"
+elif [[ "$LATEST" == "DebugAssistant-2.log" ]]; then
+  SUFFIX="-3"
 else
-  prepare_file ""
-  watch_logcat ""
+  SUFFIX=""
 fi
+
+prepare_file "$SUFFIX"
+watch_logcat "$SUFFIX"
