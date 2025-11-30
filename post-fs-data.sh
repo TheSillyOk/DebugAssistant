@@ -8,9 +8,9 @@ SAVE_FOLDER=/data/local/tmp/DebugAssistant
 mkdir -p "$SAVE_FOLDER"
 
 function prepare_file() {
-  local file_path="$SAVE_FOLDER/DebugAssistant$1.log"
+  local file_path="$1"
 
-  rm "$file_path" || true
+  rm "$file_path"
   touch "$file_path"
   chown shell:shell "$file_path"
 }
