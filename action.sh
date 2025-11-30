@@ -1,28 +1,30 @@
-#!/bin/bash
-
 # Meow's Debug Assistant's Secure Censor
 #
 # A tool to redact sensitive information from the extremely verbose debug logs of Meow's Debug Assistant.
 # LICENSE: BSD 3-Clause by ThePedroo
 
+log() {
+  echo "$1"
+  echo ""
+}
+
 SAVE_FOLDER="/data/local/tmp/DebugAssistant"
 mkdir -p "$SAVE_FOLDER"
 
-echo "Selecting the latest debug log file..."
-echo ""
+log "Selecting the latest debug log file..."
 
-LATEST=$(basename $(ls -t "$SAVE_FOLDER"/DebugAssistant* | grep -v "-Redacted" | head -n 1))
+LATEST=$(ls -t "$SAVE_FOLDER"/DebugAssistant* | grep -v "-Redacted" | head -n 1)
 if [[ "$LATEST" == "" ]]; then
-  echo "No debug log found."
+  log "[!] No debug logs found. Exiting..."
+  sleep 4
   exit 1
 fi
 
-echo "Latest debug log selected: $LATEST"
-
 NEW_LOG="$SAVE_FOLDER/DebugAssistant-Redacted.log"
 
-echo ""
-echo "Redacting sensitive information..."
+log "Latest debug log selected: $(basename $LATEST)"
+
+log "Redacting sensitive information..."
 
 sed -E                                                                   \
   -e 's/([0-9]{1,3}\.){3}[0-9]{1,3}/XXX.XXX.XXX/g'                       \
@@ -57,11 +59,9 @@ sed -E                                                                   \
                                                                          \
                                                                          \
                                                                          \
-  "$SAVE_FOLDER/$LATEST" > "$NEW_LOG"
+  "$LATEST" > "$NEW_LOG"
 
-echo ""
-echo "Redacted logs in $NEW_LOG"
-echo ""
+log "Redacted logs in $NEW_LOG"
 
 cp "$NEW_LOG" /sdcard/Download
-echo "Copied redacted log to /sdcard/Download..."
+log "Copied redacted log to /sdcard/Download..."
