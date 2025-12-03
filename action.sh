@@ -13,16 +13,18 @@ mkdir -p "$SAVE_FOLDER"
 
 log "Selecting the latest debug log file..."
 
-LATEST=$(ls -t "$SAVE_FOLDER"/DebugAssistant* | grep -v "-Redacted" | head -n 1)
-if [[ "$LATEST" == "" ]]; then
+LATEST_SUFFIX=$(basename $(ls -t "$SAVE_FOLDER/"DebugAssistant* | grep -v "-Redacted" | head -n 1) | grep -oE "(-[0-9]+)?")
+LATEST="DebugAssistant$LATEST_SUFFIX.log"
+if [[ ! -f "$SAVE_FOLDER/$LATEST" ]]; then
   log "[!] No debug logs found. Exiting..."
   sleep 4
   exit 1
 fi
 
 NEW_LOG="$SAVE_FOLDER/DebugAssistant-Redacted.log"
+DMESG_LOG="$SAVE_FOLDER/DebugAssistant-DMESG$LATEST_SUFFIX.log"
 
-log "Latest debug log selected: $(basename $LATEST)"
+log "Latest debug log selected: $LATEST"
 
 log "Redacting sensitive information..."
 
@@ -59,9 +61,11 @@ sed -E                                                                   \
                                                                          \
                                                                          \
                                                                          \
-  "$LATEST" > "$NEW_LOG"
+  "$SAVE_FOLDER/$LATEST" > "$NEW_LOG"
 
 log "Redacted logs in $NEW_LOG"
 
 cp "$NEW_LOG" /sdcard/Download
-log "Copied redacted log to /sdcard/Download..."
+cp "$DMESG_LOG" /sdcard/Download
+log "Copied redacted log and matching dmesg to /sdcard/Download..."
+sleep 3
