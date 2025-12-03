@@ -40,10 +40,10 @@ watch_dmesg() {
 }
 
 LATEST_SUFFIX=$(basename $(ls -t "$SAVE_FOLDER"/DebugAssistant*.log | grep -v "Redacted" | head -n 1) | grep -oE "([0-9]+)?")
-if [[ -f "$SAVE_FOLDER/DebugAssistant.log" && "$LATEST_SUFFIX" != "3" ]]; then
-  SUFFIX="-$(( ${LATEST_SUFFIX:-1} + 1 ))"
-else
+if [[ -z "$(ls $SAVE_FOLDER/DebugAssistant*.log)" || "${LATEST_SUFFIX:-1}" -ge 3 ]]; then
   SUFFIX=""
+else
+  SUFFIX="-$(( ${LATEST_SUFFIX:-1} + 1 ))"
 fi
 
 start_log "$SUFFIX"
