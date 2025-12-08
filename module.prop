@@ -4,3 +4,4 @@ version=versionName
 versionCode=versionNumber
 author=ThePedroo(❤️),TheSillyOk
 description=If is true, why deny?
+updateJson=https://raw.githubusercontent.com/TheSillyOk/DebugAssistant/refs/heads/remote/update.json
