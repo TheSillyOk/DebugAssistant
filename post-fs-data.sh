@@ -34,6 +34,8 @@ watch_dmesg() {
 
   if dmesg --help 2>&1 | grep -q "\-w"; then
     dmesg -w > "$file_path" &
+  elif /system/bin/dmesg --help 2>&1 | grep -q "\-w"; then
+    /system/bin/dmesg -w > "$file_path" &
   else
     while [ ! ];do dmesg > "$file_path";sleep 1;done &
   fi
