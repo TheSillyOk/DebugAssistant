@@ -3,13 +3,12 @@
 # A tool to redact sensitive information from the extremely verbose debug logs of Meow's Debug Assistant.
 # LICENSE: BSD 3-Clause by ThePedroo
 
+SAVE_FOLDER="/data/local/tmp/DebugAssistant"
+
 log() {
   echo "$1"
   echo ""
 }
-
-SAVE_FOLDER="/data/local/tmp/DebugAssistant"
-mkdir -p "$SAVE_FOLDER"
 
 log "Selecting the latest debug log file..."
 
@@ -62,10 +61,10 @@ sed -E                                                                   \
                                                                          \
                                                                          \
   "$SAVE_FOLDER/$LATEST" > "$NEW_LOG"
-
+chmod 751 "$NEW_LOG"
 log "Redacted logs in $NEW_LOG"
 
 cp "$NEW_LOG" /sdcard/Download
-cp "$DMESG_LOG" /sdcard/Download
+cp "$DMESG_LOG" /sdcard/Download/DebugAssistant-DMESG.log
 log "Copied redacted log and matching dmesg to /sdcard/Download..."
 sleep 3

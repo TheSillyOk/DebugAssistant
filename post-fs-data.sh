@@ -5,6 +5,8 @@
 
 SAVE_FOLDER="/data/local/tmp/DebugAssistant"
 mkdir -p "$SAVE_FOLDER"
+chmod 751 "$SAVE_FOLDER"
+chown shell:shell "$SAVE_FOLDER"
 
 start_log() {
   local suffix="$1"
@@ -19,6 +21,7 @@ prepare_file() {
   rm "$file_path"
   touch "$file_path"
   chown shell:shell "$file_path"
+  chmod 751 "$file_path"
 }
 
 watch_logcat() {
@@ -49,3 +52,4 @@ else
 fi
 
 start_log "$SUFFIX"
+
