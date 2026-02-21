@@ -56,11 +56,10 @@ sed -E                                                                   \
                                                                          \
                                                                          \
   "$SAVE_FOLDER/$LATEST" > "$NEW_LOG"
-
+chmod 751 "$NEW_LOG"
 printf "Redacted logs in $NEW_LOG\n\n"
 
 cp "$NEW_LOG" /sdcard/Download
-cp "$DMESG_LOG" /sdcard/Download
+cp "$DMESG_LOG" /sdcard/Download/DebugAssistant-DMESG.log
 printf "Copied redacted log and matching dmesg to /sdcard/Download...\n\n"
-
 sleep 3
