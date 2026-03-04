@@ -3,6 +3,8 @@
 # A tool to collect extremely verbose debug log from the Android system.
 # LICENSE: BSD 3-Clause by ThePedroo
 
+resetprop "persist.logd.size" "8388608"
+
 SAVE_FOLDER="/data/local/tmp/DebugAssistant"
 mkdir -p "$SAVE_FOLDER"
 chmod 751 "$SAVE_FOLDER"
